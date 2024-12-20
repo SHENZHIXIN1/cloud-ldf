@@ -23,7 +23,7 @@ export default function Home() {
     try {
       const startTime = performance.now();
 
-      const url = new URL("/api/ldf", window.location.origin);
+      const url = new URL("/api/quads", "https://quads1.ew.r.appspot.com/api/quads");
       url.searchParams.set("subject", query.subject);
       url.searchParams.set("predicate", query.predicate);
       url.searchParams.set("object", query.object);
@@ -39,7 +39,7 @@ export default function Home() {
 
       const data = await response.json();
 
-      setResults(prevResults => [...prevResults, ...(data.quads || [])]);
+      setResults(prevResults => [...prevResults, ...(data.results || [])]);
 
       setNextCursor(data.nextCursor || null);
 
