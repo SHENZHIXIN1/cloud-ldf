@@ -1,52 +1,14 @@
-import React from 'react';
-import Link from 'next/link';
-
-export default function Layout({ children }) {
+export default function RootLayout({ children }) {
   return (
-    <div>
-      {/* Navigation */}
-      <nav className="navbar navbar-expand-lg navbar-light bg-light">
-        <div className="container-fluid">
-          <Link href="/" className="navbar-brand">TinyLDF</Link> {/* Home link */}
-          <button
-            className="navbar-toggler"
-            type="button"
-            data-bs-toggle="collapse"
-            data-bs-target="#navbarNav"
-            aria-controls="navbarNav"
-            aria-expanded="false"
-            aria-label="Toggle navigation"
-          >
-            <span className="navbar-toggler-icon"></span>
-          </button>
-          <div className="collapse navbar-collapse" id="navbarNav">
-            <ul className="navbar-nav">
-              <li className="nav-item">
-                <Link href="/view-quads" className="nav-link">View Quads</Link>
-              </li>
-              <li className="nav-item">
-                <Link href="/insert" className="nav-link">Insert Quad</Link>
-              </li>
-              <li className="nav-item">
-                <Link href="/upload" className="nav-link">Upload File</Link>
-              </li>
-              <li className="nav-item">
-                <Link href="/login" className="nav-link">Login</Link>
-              </li>
-            </ul>
-          </div>
-        </div>
-      </nav>
-
-      {/* Main Content */}
-      <main className="container mt-4">
-        {children}  {/* Render child components (page content) */}
-      </main>
-
-      {/* Footer */}
-      <footer className="text-center py-4">
-        <p>&copy; 2024 TinyLDF. All rights reserved.</p>
-      </footer>
-    </div>
+    <html lang="en">
+      <head>
+        <meta charSet="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <title>Next.js App</title>
+      </head>
+      <body>
+        {children} 
+      </body>
+    </html>
   );
 }
