@@ -1,36 +1,53 @@
 import { NextResponse } from 'next/server';
 
-let allQuads = [
-  { id: 1, graph: 'exampleGraph', subject: 'exampleSubject1', predicate: 'examplePredicate', object: 'exampleObject1' },
-  { id: 2, graph: 'exampleGraph', subject: 'exampleSubject2', predicate: 'examplePredicate', object: 'exampleObject2' },
-  { id: 3, graph: 'exampleGraph', subject: 'exampleSubject3', predicate: 'examplePredicate', object: 'exampleObject3' },
-  { id: 4, graph: 'exampleGraph', subject: 'exampleSubject4', predicate: 'examplePredicate', object: 'exampleObject4' },
+const quads = [
+  {
+    id: 5634161670881280,
+    graph: "http://example.org/graph1",
+    subject: "http://example.org/resource1",
+    predicate: "http://schema.org/name",
+    object: "Alice"
+  },
 ];
 
-export async function POST(request) {
-  const { graph, subject, predicate, object, cursor } = await request.json();
-  const pageSize = 50;
+export async function GET(request) {
+  const { searchParams } = new URL(request.url);
+  const graph = searchParams.get('graph');
+  const subject = searchParams.get('subject');
+  const predicate = searchParams.get('predicate');
+  const object = searchParams.get('object');
+  const cursor = searchParams.get('cursor');
 
-  let filteredQuads = allQuads.filter((quad) => {
+  const filteredQuads = quads.filter(quad => {
     return (
+      (!graph || quad.graph === graph) &&
       (!subject || quad.subject.includes(subject)) &&
       (!predicate || quad.predicate.includes(predicate)) &&
-      (!object || quad.object.includes(object)) &&
-      (!graph || quad.graph.includes(graph))
+      (!object || quad.object.includes(object))
     );
   });
 
-  let startIndex = 0;
-  if (cursor) {
-    startIndex = parseInt(cursor, 10);
+  const pageSize = 50;
+  const nextCursor = filteredQuads.length > pageSize ? 'CiMSHWoIZX5xdWFkczFyEQsSBHF1YWQYgICA6NeHgQoMGAAgAA==' : null;
+  const results = filteredQuads.slice(0, pageSize);
+
+  return NextResponse.json({ results, nextCursor });
+}
+
+export async function POST(request) {
+  const { graph, subject, predicate, object } = await request.json();
+
+  if (!graph || !subject || !predicate || !object) {
+    return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
   }
 
-  const pageResults = filteredQuads.slice(startIndex, startIndex + pageSize);
+  const newQuad = {
+    id: Date.now(),
+    graph,
+    subject,
+    predicate,
+    object
+  };
 
-  const nextCursor = startIndex + pageSize < filteredQuads.length ? startIndex + pageSize : null;
-
-  return NextResponse.json({
-    quads: pageResults,
-    nextCursor,
-  });
+  return NextResponse.json(newQuad, { status: 201 });
 }

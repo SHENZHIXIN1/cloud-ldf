@@ -4,13 +4,10 @@ import { useState } from "react";
 
 export default function Home() {
   const [query, setQuery] = useState({ subject: "", predicate: "", object: "", graph: "" });
-
   const [results, setResults] = useState([]);
-
   const [loading, setLoading] = useState(false);
   const [executionTime, setExecutionTime] = useState(null);
   const [error, setError] = useState(null);
-
   const [nextCursor, setNextCursor] = useState(null);
 
   const handleInputChange = (e) => {
@@ -36,7 +33,6 @@ export default function Home() {
         url.searchParams.set("cursor", cursor);
       }
 
-      // Make the request
       const response = await fetch(url);
 
       if (!response.ok) throw new Error("Failed to fetch data");
