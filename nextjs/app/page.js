@@ -3,7 +3,7 @@
 import { useState } from "react";
 
 export default function Home() {
-  const [query, setQuery] = useState({ subject: "", predicate: "", object: "" });
+  const [query, setQuery] = useState({ subject: "", predicate: "", object: "", graph: "" });
   const [results, setResults] = useState([]);
   const [loading, setLoading] = useState(false);
   const [executionTime, setExecutionTime] = useState(null);
@@ -22,13 +22,13 @@ export default function Home() {
     try {
       const startTime = performance.now();
       const response = await fetch(
-        `/api/ldf?subject=${query.subject}&predicate=${query.predicate}&object=${query.object}`
+        `/api/ldf?subject=${query.subject}&predicate=${query.predicate}&object=${query.object}&graph=${query.graph}`
       );
 
       if (!response.ok) throw new Error("Failed to fetch data");
 
       const data = await response.json();
-      setResults(data.triples || []);
+      setResults(data.quads || []);
       setExecutionTime((performance.now() - startTime).toFixed(2));
     } catch (err) {
       setError(err.message);
@@ -48,7 +48,7 @@ export default function Home() {
           Wikidata
         </h2>
         <p style={{ fontSize: "1rem", margin: 0 }}>
-          Query Wikidata by triple pattern
+          Query Wikidata by quads pattern
         </p>
       </header>
 
@@ -104,6 +104,23 @@ export default function Home() {
             }}
           />
         </label>
+        <label style={{ display: "block", marginBottom: "10px" }}>
+          <strong>graph:</strong>
+          <input
+            type="text"
+            name="graph"
+            value={query.graph}
+            onChange={handleInputChange}
+            style={{
+              display: "block",
+              width: "100%",
+              padding: "10px",
+              marginTop: "5px",
+              border: "1px solid #ddd",
+              borderRadius: "4px",
+            }}
+          />
+        </label>
         <button
           onClick={fetchResults}
           style={{
@@ -116,7 +133,7 @@ export default function Home() {
             cursor: "pointer",
           }}
         >
-          Find matching triples
+          Find matching quads
         </button>
       </div>
 
@@ -151,6 +168,9 @@ export default function Home() {
               </p>
               <p>
                 <strong>Object:</strong> {result.object}
+              </p>
+              <p>
+                <strong>Graph:</strong> {result.graph || "No graph available"}
               </p>
             </li>
           ))}
