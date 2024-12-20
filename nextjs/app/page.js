@@ -1,4 +1,4 @@
-"use client"; // 客户端组件
+"use client";
 
 import { useState } from "react";
 
