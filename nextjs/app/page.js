@@ -4,36 +4,60 @@ import { useState } from "react";
 
 export default function Home() {
   const [query, setQuery] = useState({ subject: "", predicate: "", object: "", graph: "" });
+
   const [results, setResults] = useState([]);
+
   const [loading, setLoading] = useState(false);
   const [executionTime, setExecutionTime] = useState(null);
   const [error, setError] = useState(null);
+
+  const [nextCursor, setNextCursor] = useState(null);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setQuery({ ...query, [name]: value });
   };
 
-  const fetchResults = async () => {
+  const fetchResults = async (cursor = null) => {
     setLoading(true);
     setError(null);
     setExecutionTime(null);
 
     try {
       const startTime = performance.now();
-      const response = await fetch(
-        `/api/ldf?subject=${query.subject}&predicate=${query.predicate}&object=${query.object}&graph=${query.graph}`
-      );
+
+      const url = new URL("/api/ldf", window.location.origin);
+      url.searchParams.set("subject", query.subject);
+      url.searchParams.set("predicate", query.predicate);
+      url.searchParams.set("object", query.object);
+      url.searchParams.set("graph", query.graph);
+
+      if (cursor) {
+        url.searchParams.set("cursor", cursor);
+      }
+
+      // Make the request
+      const response = await fetch(url);
 
       if (!response.ok) throw new Error("Failed to fetch data");
 
       const data = await response.json();
-      setResults(data.quads || []);
+
+      setResults(prevResults => [...prevResults, ...(data.quads || [])]);
+
+      setNextCursor(data.nextCursor || null);
+
       setExecutionTime((performance.now() - startTime).toFixed(2));
     } catch (err) {
       setError(err.message);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const loadMoreResults = () => {
+    if (nextCursor) {
+      fetchResults(nextCursor);
     }
   };
 
@@ -45,10 +69,10 @@ export default function Home() {
           Data Fragments
         </h1>
         <h2 style={{ fontSize: "1.5rem", margin: "10px 0", color: "red" }}>
-          Wikidata
+          Data Query
         </h2>
         <p style={{ fontSize: "1rem", margin: 0 }}>
-          Query Wikidata by quads pattern
+          Query data using the quad pattern
         </p>
       </header>
 
@@ -122,7 +146,7 @@ export default function Home() {
           />
         </label>
         <button
-          onClick={fetchResults}
+          onClick={() => fetchResults()}
           style={{
             marginTop: "10px",
             padding: "10px 20px",
@@ -133,7 +157,7 @@ export default function Home() {
             cursor: "pointer",
           }}
         >
-          Find matching quads
+          Query
         </button>
       </div>
 
@@ -148,7 +172,7 @@ export default function Home() {
 
       <section>
         <h3 style={{ fontSize: "1.2rem", marginBottom: "10px" }}>
-          Matches in Wikidata for:
+          Query Results:
         </h3>
         <ul style={{ listStyleType: "none", padding: 0, margin: 0 }}>
           {results.map((result, index) => (
@@ -176,6 +200,23 @@ export default function Home() {
           ))}
         </ul>
       </section>
+
+      {nextCursor && (
+        <button
+          onClick={loadMoreResults}
+          style={{
+            marginTop: "20px",
+            padding: "10px 20px",
+            backgroundColor: "green",
+            color: "#fff",
+            border: "none",
+            borderRadius: "4px",
+            cursor: "pointer",
+          }}
+        >
+          Load More
+        </button>
+      )}
     </div>
   );
 }
