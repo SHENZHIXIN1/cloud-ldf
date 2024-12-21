@@ -1,6 +1,6 @@
-# TinyLDF
+# TinyLDF - https://ldf-site.ew.r.appspot.com/
 
-## Backend
+## Backend (https://github.com/emerikaji/quads-api)
 
 ### Features
 - **Search for Quads**: The backend provides an API to search for quads based on `subject`, `predicate`, `object`, and `graph`. The API supports pagination using a `cursor` parameter.
