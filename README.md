@@ -41,7 +41,7 @@
 ### Missing Feature: **Add Quads**
 - The **"Add Quad"** feature has not yet been implemented in the frontend. Users cannot currently add new quads from the user interface.
 
-## members
+## Members
 - Emerik AJI
 - Zhixin SHEN
 - Moustapha DIOP
