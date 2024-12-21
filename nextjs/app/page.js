@@ -24,10 +24,12 @@ export default function Home() {
       const startTime = performance.now();
 
       const url = new URL("/api/quads", "https://quads1.ew.r.appspot.com/api/quads");
-      url.searchParams.set("subject", query.subject);
-      url.searchParams.set("predicate", query.predicate);
-      url.searchParams.set("object", query.object);
-      url.searchParams.set("graph", query.graph);
+      url.searchParams.set("subject", query.subject || "");
+      url.searchParams.set("predicate", query.predicate || "");
+      url.searchParams.set("object", query.object || "");
+      url.searchParams.set("graph", query.graph || "");
+
+      console.log("Current request URL:", url.toString());
 
       if (cursor) {
         url.searchParams.set("cursor", cursor);
@@ -38,6 +40,7 @@ export default function Home() {
       if (!response.ok) throw new Error("Failed to fetch data");
 
       const data = await response.json();
+      console.log("Fetched data:", data);
 
       setResults(prevResults => [...prevResults, ...(data.results || [])]);
 
